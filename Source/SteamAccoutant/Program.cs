@@ -11,7 +11,7 @@ namespace SteamWalletHistory {
             Console.OutputEncoding = UTF8Encoding.UTF8;
 
             tagStart:
-            Console.WriteLine("type 'help' or 'h' for help, or enter to continue");
+            Console.WriteLine("type 'help' or 'h' for help, or enter to start");
             string read = Console.ReadLine().ToLower();
             if (read == "help" || read == "h")
                 Console.WriteLine(@"---------------- EN--------------------------------
@@ -46,8 +46,12 @@ Lorsque le programme est lancé, vous serez ammenez a indiquer le chemin du fich
             int buyNb = 0;
             double refund = 0;
             int refundNb = 0;
+            double transactionPos = 0;
+            double transactionNeg = 0;
+            int transactionNb = 0;
             string firstTransaction = "";
             int lineNb = 0;
+            int lineBuy = 0;
             char currency = ' ';
 
             try {
@@ -72,43 +76,72 @@ Lorsque le programme est lancé, vous serez ammenez a indiquer le chemin du fich
                     currency = '€';
                 else if (sample.Contains('$'))
                     currency = '$';
-                //else if (sample.Contains('¥'))
-                //    currency = '¥';
                 else {
-                    Console.WriteLine("No currency detected");
-                    goto tagStart;
+                    Console.WriteLine("No currency detected\n"+
+                                    "Choose a custom currency  ? [Yes/No]");
+                    if (Console.ReadLine().ToLower() == "yes") {
+                        Console.WriteLine("Enter currency symbol (Ex : €, $) :\n" +
+                            "Warning : The language of the text MUST be in English, French or Spanish");
+                        currency = Console.ReadLine()[0];
+                    } else
+                        goto tagStart;
                 }
                 // Reset StreamReader
                 reader.Close();
                 reader = new StreamReader(path);
 
                 while (!reader.EndOfStream) {
-                    string cl = reader.ReadLine();
+                    string cl = reader.ReadLine().ToLower();
                     lineNb++;
-                    // French || English || Espanol,Espana
-                    if (cl == "Crédité" || cl == "Credit" || cl == "Crédito") {
+                    if(DateTime.TryParse(cl.Split('\t')[0],out _)) {
+                        break;
+                    }
+                }
+
+                while (!reader.EndOfStream) {
+                    string cl = reader.ReadLine().ToLower();
+                    lineNb++;
+                    // French || English || Spanish
+                    /*if (cl.Contains("crédité") || cl == "credit" || cl == "crédito") {
                         string line = reader.ReadLine().Replace('-', '0');
                         creditNb++;
-                        Console.WriteLine("Credit : " + line);
+                        Console.WriteLine(lineNb + "Credit : " + line);
                         lineNb++;
                         credit += double.Parse(line.Split(currency)[0]);
-                    } else if (cl == "Achat" || cl == "Purchase" || cl == "Compra") {
+                        // Achat en jeu
+                    } else*/ if (cl=="achat" || cl == "achat en jeu" || cl == "purchase" || cl == "in-game purchase" || cl == "compra" ||cl =="Compra en un juego") {
                         // Consume a line
                         reader.ReadLine();
                         string line = reader.ReadLine().Replace('-', '0');
                         buyNb++;
+                        lineBuy = lineNb;
                         lineNb += 2;
-                        Console.WriteLine("Purchase : " + line);
+                        Console.WriteLine(lineNb + "Purchase : " + line);
                         buy += +double.Parse(line.Split(currency)[0]);
-                    } else if (cl == "Remboursement" || cl == "Refund" || cl == "Reembolso") {
+                    } else if (cl=="remboursement" || cl == "refund" || cl == "reembolso") {
                         // Consume 2 lines
                         reader.ReadLine();
                         reader.ReadLine();
                         string line = reader.ReadLine().Replace('-', '0');
                         refundNb++;
                         lineNb += 3;
-                        Console.WriteLine("Refund : " + line);
+                        Console.WriteLine(lineNb+"Refund : " + line);
                         refund += double.Parse(line.Split(currency)[0]);
+                    } else if (cl.Contains("transaction") || cl.Contains("transacci")) {
+                        reader.ReadLine();
+                        reader.ReadLine();
+                        string line = reader.ReadLine().ToLower();
+                        lineNb += 3;
+                        transactionNb++;
+                        if (line.Contains("crédité") || line.Contains("credit") || line.Contains("crédito")) {
+                            line = reader.ReadLine().Replace('-', '0');
+                            lineNb++;
+                            transactionNeg += double.Parse(line.Split(currency)[0]);
+                        } else {
+                            line = line.Replace('-', '0');
+                            transactionPos += double.Parse(line.Split(currency)[0]);
+                        }
+                        Console.WriteLine(lineNb + "Transaction : " + line);
                     }
                 }
                 // Reset StreamReader
@@ -116,7 +149,7 @@ Lorsque le programme est lancé, vous serez ammenez a indiquer le chemin du fich
                 reader = new StreamReader(path);
 
                 // Take first transaction w/ date
-                for (int i = 0; i < lineNb - 5; i++) {
+                for (int i = 0; i < lineBuy - 3; i++) {
                     reader.ReadLine();
                 }
                 firstTransaction = reader.ReadLine().Replace("\t", "");
@@ -124,14 +157,15 @@ Lorsque le programme est lancé, vous serez ammenez a indiquer le chemin du fich
 
             }
             catch (Exception e) {
-                Console.WriteLine("Exception : " + e.Message + e.StackTrace + e.Source);
+                Console.WriteLine("Exception : " + e.Message + e.StackTrace);
             }
-            Console.WriteLine($"\nSteam shop total sale(s) : {Math.Round(credit, 2)}{currency} for {creditNb} transactions\n " +
-                $"Purchase(s) : {Math.Round(buy, 2)}{currency} for {buyNb} transactions\n " +
+            double totalTransac = transactionPos - transactionNeg;
+            Console.WriteLine(transactionPos + "---" + transactionNeg);
+            Console.WriteLine($"\nSteam shop total sale(s) : {((totalTransac > 0) ? "+" : "")}{Math.Round(totalTransac,2)}{currency} for {transactionNb} transactions\n " +
+                $"Purchase(s) : {Math.Round(buy, 2)}{currency} for {buyNb} purchases\n " +
                 $"Refund(s) : {Math.Round(refund, 2)}{currency} for {refundNb} refunds\n" +
-                $"Purchases - refunds : {Math.Round(buy - refund, 2)}{currency}\n" +
-                $"Gain : {Math.Round(credit - (buy - refund), 2) }{currency}\n" +
-                $"First transaction : {firstTransaction}\n\n" +
+                $"Gained/lost : {Math.Round(totalTransac - (buy - refund), 2) }{currency}\n" +
+                $"First transaction : {firstTransaction}\n\n" +              
                 "Press any key to exit");
             Console.Read();
         }

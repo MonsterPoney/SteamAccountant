@@ -1,0 +1,13 @@
+C:\Users\WolfyX\source\repos\SteamAccoutant\SteamAccoutant\bin\Release\SteamAccoutant.exe.config
+C:\Users\WolfyX\source\repos\SteamAccoutant\SteamAccoutant\bin\Release\SteamAccoutant.exe
+C:\Users\WolfyX\source\repos\SteamAccoutant\SteamAccoutant\bin\Release\SteamAccoutant.pdb
+C:\Users\WolfyX\source\repos\SteamAccoutant\SteamAccoutant\obj\Release\SteamAccoutant.csprojAssemblyReference.cache
+C:\Users\WolfyX\source\repos\SteamAccoutant\SteamAccoutant\obj\Release\SteamAccoutant.exe
+C:\Users\WolfyX\source\repos\SteamAccoutant\SteamAccoutant\obj\Release\SteamAccoutant.pdb
+F:\git_repo\SteamAccountant\Source\SteamAccoutant\bin\Release\SteamAccoutant.exe.config
+F:\git_repo\SteamAccountant\Source\SteamAccoutant\bin\Release\SteamAccoutant.exe
+F:\git_repo\SteamAccountant\Source\SteamAccoutant\bin\Release\SteamAccoutant.pdb
+F:\git_repo\SteamAccountant\Source\SteamAccoutant\obj\Release\SteamAccoutant.csprojAssemblyReference.cache
+F:\git_repo\SteamAccountant\Source\SteamAccoutant\obj\Release\SteamAccoutant.csproj.CoreCompileInputs.cache
+F:\git_repo\SteamAccountant\Source\SteamAccoutant\obj\Release\SteamAccoutant.exe
+F:\git_repo\SteamAccountant\Source\SteamAccoutant\obj\Release\SteamAccoutant.pdb
